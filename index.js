@@ -18,7 +18,23 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try{
-        const serviceCollection = client.db('quickFood').collection('services')
+        const serviceCollection = client.db('quickFood').collection('services');
+
+        //get all services
+        app.get('/service', async(req, res) => {
+            const query = {};
+            const cursor = serviceCollection.find(query)
+            const services = await cursor.limit(3).toArray();
+            res.send(services)
+        })
+        
+        //get all services
+        app.get('/services', async(req, res) => {
+            const query = {};
+            const cursor = serviceCollection.find(query)
+            const services = await cursor.toArray();
+            res.send(services)
+        })
     }
     catch(error){
         console.log(error.name.bgRed, error.message);
