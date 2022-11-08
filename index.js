@@ -19,6 +19,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try{
         const serviceCollection = client.db('quickFood').collection('services');
+        const reviewsCollection = client.db('quickFood').collection('reviews');
 
         //get all services
         app.get('/service', async(req, res) => {
@@ -40,8 +41,33 @@ async function run() {
         app.get("/services/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
-            
+            const service = await serviceCollection.findOne(query);
+            res.send(service);
         });
+
+        //reviews api get
+        app.get('/reviews', async(req, res) => {
+            console.log(req.query.email);
+
+            let query = {};
+            if(req.query.email){
+                query = {  
+                    email: req.query.email
+                }
+            }
+            const cursor = reviewsCollection.find(query)
+            const reviews = await cursor.toArray();
+            res.send(reviews)
+        })
+
+        //reviews post api
+        app.post('/reviews', async(req, res) => {
+            const review = req.body;
+            const result = await reviewsCollection.insertOne(review)
+            res.send(result)
+        })
+        
+
     }
     catch(error){
         console.log(error.name.bgRed, error.message);
