@@ -75,7 +75,7 @@ async function run() {
         //reviews api get
         app.get('/reviews',verifyJWT, async(req, res) => {
             const decoded = req.decoded;
-            console.log('inside review api decoded', decoded);
+            // console.log('inside review api decoded', decoded);
             if(decoded.email !== req.query.email){
                 res.status(403).send({message: 'unauthorized access'})
             }
@@ -97,12 +97,27 @@ async function run() {
             const result = await reviewsCollection.insertOne(review)
             res.send(result)
         })
+
         //update reviews api
-        app.put('/reviews/:id', (req, res) => {
+        app.get('/reviews/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)}
+            const user = await reviewsCollection.findOne(query)
+            res.send(user)
+        })
+        
+        app.put('/reviews/:id', async(req, res) => {
             const id = req.params.id;
             const filter = {_id: ObjectId(id)}
-            const updateUser = req.body;
-            console.log(updateUser);
+            const user = req.body;
+            const option = { upsert: true };
+            const updatedUser = {
+                $set:{
+                    message: user.message
+                }
+            }
+            const result = await reviewsCollection.updateOne(filter, updatedUser, option)
+            res.send(result)
         })
 
 
