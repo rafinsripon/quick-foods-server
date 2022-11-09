@@ -17,6 +17,7 @@ app.use(express.json());
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.0mxdn2v.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+//jwt token function
 function verifyJWT(req, res, next){
     const authHeader = req.headers.authorization;
     if(!authHeader){
@@ -44,8 +45,6 @@ async function run() {
             const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'})
             res.send({token})
         })
-
-
 
 
         //get 3 services
@@ -79,7 +78,7 @@ async function run() {
             res.send(service);
         });
 
-        //reviews api get
+        //reviews api get and jwt token
         app.get('/reviews',verifyJWT, async(req, res) => {
             const decoded = req.decoded;
             // console.log('inside review api decoded', decoded);
@@ -98,7 +97,7 @@ async function run() {
             res.send(reviews)
         })
 
-        //===============
+        //All Reviews Api
         app.get('/review', async(req, res) => {
             const query = {};
             const cursor = reviewsCollection.find(query)
@@ -107,7 +106,7 @@ async function run() {
         })
 
         //reviews post api
-        app.post('/reviews', async(req, res) => {
+        app.post('/review', async(req, res) => {
             const review = req.body;
             const result = await reviewsCollection.insertOne(review)
             res.send(result)
@@ -151,8 +150,6 @@ async function run() {
     }
 }
 run();
-
-
 
 
 app.get('/', (req, res) => {
