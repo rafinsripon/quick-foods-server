@@ -71,8 +71,6 @@ async function run() {
             res.send(result)
         })
 
-
-
         //get one services
         app.get("/services/:id", async (req, res) => {
             const id = req.params.id;
@@ -80,8 +78,6 @@ async function run() {
             const service = await serviceCollection.findOne(query);
             res.send(service);
         });
-
-
 
         //reviews api get
         app.get('/reviews',verifyJWT, async(req, res) => {
@@ -100,6 +96,14 @@ async function run() {
             const cursor = reviewsCollection.find(query).sort({time: -1});
             const reviews = await cursor.toArray();
             res.send(reviews)
+        })
+
+        //===============
+        app.get('/review', async(req, res) => {
+            const query = {};
+            const cursor = reviewsCollection.find(query)
+            const review = await cursor.toArray();
+            res.send(review)
         })
 
         //reviews post api
