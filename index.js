@@ -104,7 +104,7 @@ async function run() {
                 const sid = req.query.id;
                 query = {service: sid}
             }
-            const cursor = reviewsCollection.find(query);
+            const cursor = reviewsCollection.find(query).sort({time: -1});
             const reviews = await cursor.toArray();
             res.send(reviews)
         })
