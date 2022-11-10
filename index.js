@@ -83,7 +83,7 @@ async function run() {
             const decoded = req.decoded;
             // console.log('inside review api decoded', decoded);
             if(decoded.email !== req.query.email){
-                res.status(403).send({message: 'unauthorized access'})
+               return res.status(403).send({message: 'unauthorized access'})
             }
 
             let query = {};
@@ -97,16 +97,20 @@ async function run() {
             res.send(reviews)
         })
 
-        //All Reviews Api
+        // //All Reviews Api
         app.get('/review', async(req, res) => {
-            const query = {};
-            const cursor = reviewsCollection.find(query)
-            const review = await cursor.toArray();
-            res.send(review)
+            let query = {};
+            if(req.query.id){
+                const sid = req.query.id;
+                query = {service: sid}
+            }
+            const cursor = reviewsCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews)
         })
 
         //reviews post api
-        app.post('/review', async(req, res) => {
+        app.post('/reviews', async(req, res) => {
             const review = req.body;
             const result = await reviewsCollection.insertOne(review)
             res.send(result)
